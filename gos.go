@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"strings"
 
 	"github.com/lunny/tango"
 	"github.com/tango-contrib/basicauth"
@@ -14,6 +15,7 @@ var (
 	user    = flag.String("user", "", "basic auth user name")
 	pass    = flag.String("pass", "", "basic auth user password")
 	listDir = flag.Bool("listDir", false, "if list dir files")
+	exts    = flag.String("exts", "", "filtered ext files will be supplied")
 )
 
 func main() {
@@ -24,10 +26,15 @@ func main() {
 		t.Use(basicauth.New(*user, *pass))
 		t.Logger().Info("Basic auth module loaded")
 	}
+	var filterExts []string
+	if len(*exts) > 0 {
+		filterExts = strings.Split(*exts, ",")
+	}
 	t.Use(tango.Logging())
 	t.Use(tango.Static(tango.StaticOptions{
-		RootPath: *dir,
-		ListDir:  *listDir,
+		RootPath:   *dir,
+		ListDir:    *listDir,
+		FilterExts: filterExts,
 	}))
 
 	t.Mode = *mode
